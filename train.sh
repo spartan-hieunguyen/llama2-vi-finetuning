@@ -1,0 +1,29 @@
+python ./scripts/train.py \
+  --model_name_or_path "NousResearch/Llama-2-7b-hf"\
+  --train_data_file ./data/train.json \
+  --eval_data_file ./data/eval.json \
+  --prompt_path ./data/alpaca.json \
+  --do_train True \
+  --no_cuda True \
+  --per_device_train_batch_size 4 \
+  --per_device_eval_batch_size 1 \
+  --output_dir ./checkpoint/vi-finetune-v1 \
+  --overwrite_output_dir True \
+  --weight_decay 0.001 \
+  --learning_rate 2e-4 \
+  --warmup_ratio 0.05 \
+  --evaluation_strategy steps \
+  --gradient_accumulation_step 2 \
+  --group_by_length True \
+  --max_steps 10000 \
+  --max_grad_norm 0.3 \
+  --logging_strategy steps \
+  --save_strategy steps \
+  --logging_steps 200 \
+  --save_steps 1000 \
+  --report_to tensorboard \
+  --lr_scheduler_type cosine \
+  --save_total_limit 3 \
+  --fp16 False \
+  --bf16 False \
+  --prompt_path ./template/alpaca.json

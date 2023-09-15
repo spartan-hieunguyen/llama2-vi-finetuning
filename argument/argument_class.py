@@ -78,3 +78,6 @@ class CustomTrainingArguments(TrainingArguments):
     packing: Optional[bool] = field(
         default=False, metadata={"help": "Supervised finetuning dataset packing"}
     )
+    is_chat_model: Optional[bool] = field(
+        default=False, metadata={"help": "Chat model"}
+    )

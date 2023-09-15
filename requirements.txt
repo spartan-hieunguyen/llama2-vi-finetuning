@@ -8,3 +8,4 @@ accelerate==0.21.0
 bitsandbytes==0.40.2
 trl==0.4.7
 scipy
+gradio

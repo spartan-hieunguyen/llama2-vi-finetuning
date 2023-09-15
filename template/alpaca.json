@@ -1,6 +1,6 @@
 {
     "description": "Template used by Alpaca-LoRA.",
-    "prompt_input": "Dưới đây là một hướng dẫn mô tả một nhiệm vụ, kèm với thông tin cung cấp thêm bối cảnh.Hãy viết một phản hồi phù hợp để hoàn thành yêu cầu đó.\n\n### Chỉ dẫn:\n{instruction}\n\n### Thông tin:\n{input}\n\n### Phản hồi:\n",
+    "prompt_input": "Dưới đây là một hướng dẫn mô tả một nhiệm vụ, kèm với thông tin cung cấp thêm bối cảnh. Hãy viết một phản hồi phù hợp để hoàn thành yêu cầu đó.\n\n### Chỉ dẫn:\n{instruction}\n\n### Thông tin:\n{input}\n\n### Phản hồi:\n",
     "prompt_no_input": "Dưới đây là một hướng dẫn mô tả một nhiệm vụ. Hãy viết một phản hồi phù hợp để hoàn thành yêu cầu đó.\n\n### Chỉ dẫn:\n{instruction}\n\n### Phản hồi:\n",
     "response_split": "### Phản hồi:"
 }

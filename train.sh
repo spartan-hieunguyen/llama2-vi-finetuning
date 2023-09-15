@@ -1,8 +1,8 @@
 python ./scripts/train.py \
-  --model_name_or_path "NousResearch/Llama-2-7b-hf"\
+  --model_name_or_path "NousResearch/Llama-2-7b-chat-hf"\
   --train_data_file ./data/train.json \
   --eval_data_file ./data/eval.json \
-  --prompt_path ./data/alpaca.json \
+  --is_chat_model True \
   --do_train True \
   --no_cuda True \
   --per_device_train_batch_size 4 \
@@ -26,4 +26,5 @@ python ./scripts/train.py \
   --save_total_limit 3 \
   --fp16 False \
   --bf16 False \
-  --prompt_path ./template/alpaca.json
+  --prompt_path ./template/alpaca.json \
+  --optim paged_adamw_32bit

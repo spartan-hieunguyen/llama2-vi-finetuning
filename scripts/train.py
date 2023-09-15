@@ -8,8 +8,7 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
-    HfArgumentParser,
-    TrainingArguments
+    HfArgumentParser
 )
 from peft import LoraConfig, set_peft_model_state_dict
 
@@ -85,17 +84,9 @@ def main():
         task_type="CAUSAL_LM",
     )
 
-    # for transformers.Trainer
-    # tokenize_fn = partial(tokenize, tokenizer=tokenizer, add_eos_token=True, max_len=512)
-    # generate_and_tokenize_prompt = partial(generate_and_tokenize_prompt,
-    #                                        tokenize_fn=tokenize_fn,
-    #                                        prompter=prompter,
-    #                                        train_on_inputs=True,
-    #                                        add_eos_token=True)
-    # train_dataset.map(generate_and_tokenize_prompt)
-    # eval_dataset.map(generate_and_tokenize_prompt)
-
-    prompter = Prompter(data_args.prompt_template_name, template_json_path=data_args.prompt_path)
+    prompter = Prompter(data_args.prompt_template_name,
+                        template_json_path=data_args.prompt_path,
+                        is_chat_model=training_args.is_chat_model)
     formatting_prompts_func = partial(generate_prompt, prompter=prompter)
 
     # Load dataset
@@ -103,30 +94,6 @@ def main():
     eval_dataset = load_dataset("json", data_files=data_args.eval_data_file, split="train")
     train_dataset = train_dataset.shuffle().map(formatting_prompts_func)
     eval_dataset = eval_dataset.shuffle().map(formatting_prompts_func)
-
-
-    # Set training parameters
-    training_arguments = TrainingArguments(
-        output_dir=training_args.output_dir,
-        num_train_epochs=training_args.num_train_epochs,
-        per_device_train_batch_size=training_args.per_device_train_batch_size,
-        per_device_eval_batch_size=training_args.per_device_eval_batch_size,
-        gradient_accumulation_steps=training_args.gradient_accumulation_steps,
-        optim=training_args.optim,
-        save_steps=training_args.save_steps,
-        logging_steps=training_args.logging_steps,
-        learning_rate=training_args.learning_rate,
-        weight_decay=training_args.weight_decay,
-        fp16=training_args.fp16,
-        bf16=training_args.bf16,
-        max_grad_norm=training_args.max_grad_norm,
-        max_steps=training_args.max_steps,
-        warmup_ratio=training_args.warmup_ratio,
-        group_by_length=training_args.group_by_length,
-        lr_scheduler_type=training_args.lr_scheduler_type,
-        report_to=training_args.report_to,
-        save_total_limit=training_args.save_total_limit
-    )
 
     # Set supervised fine-tuning parameters
     trainer = SFTTrainer(
@@ -137,7 +104,7 @@ def main():
         dataset_text_field="text",
         max_seq_length=training_args.max_seq_length,
         tokenizer=tokenizer,
-        args=training_arguments,
+        args=training_args,
         packing=training_args.packing,
     )
 

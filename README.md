@@ -12,11 +12,14 @@ pip install -e .
 ```
 
 ## Usage
-
+To finetune model, please run the bash script or follows the content in the file.
 ```bash
 ./train.sh
 ```
-
+For interactive inference:
+```bash
+python ./script/inference.py <kwargs>
+```
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first

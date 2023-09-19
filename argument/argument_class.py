@@ -81,3 +81,6 @@ class CustomTrainingArguments(TrainingArguments):
     is_chat_model: Optional[bool] = field(
         default=False, metadata={"help": "Chat model"}
     )
+    model_type: Optional[str] = field(
+        default="gptj", metadata={"help": "Model type"}
+    )

@@ -10,10 +10,11 @@ from transformers import (
     BitsAndBytesConfig,
     HfArgumentParser
 )
-from peft import LoraConfig, set_peft_model_state_dict
+from peft import LoraConfig
 
-from argument.argument_class import DataTrainingArguments, ModelArguments, CustomTrainingArguments
 from dataset import Prompter, generate_prompt
+from config.config import TRANSFORMERS_MODELS_TO_LORA_TARGET_MODULES_MAPPING
+from argument.argument_class import DataTrainingArguments, ModelArguments, CustomTrainingArguments
 
 
 def main():
@@ -58,23 +59,6 @@ def main():
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right" # Fix weird overflow issue with fp16 training
 
-    if training_args.resume_from_checkpoint:
-        checkpoint_name = os.path.join(
-            training_args.resume_from_checkpoint, "pytorch_model.bin"
-        )
-        if not os.path.exists(checkpoint_name):
-            checkpoint_name = os.path.join(
-                training_args.resume_from_checkpoint, "adapter_model.bin"
-            )
-            training_args.resume_from_checkpoint = False
-
-        if os.path.exists(checkpoint_name):
-            print(f"Restarting from {checkpoint_name}")
-            adapters_weights = torch.load(checkpoint_name)
-            set_peft_model_state_dict(model, adapters_weights)
-        else:
-            print(f"Checkpoint {checkpoint_name} not found")
-
     # Load LoRA configuration
     peft_config = LoraConfig(
         lora_alpha=training_args.lora_alpha,
@@ -82,6 +66,8 @@ def main():
         r=training_args.lora_r,
         bias="none",
         task_type="CAUSAL_LM",
+        inference_mode=False,
+        target_modules=TRANSFORMERS_MODELS_TO_LORA_TARGET_MODULES_MAPPING[training_args.model_type],
     )
 
     prompter = Prompter(data_args.prompt_template_name,
@@ -90,10 +76,12 @@ def main():
     formatting_prompts_func = partial(generate_prompt, prompter=prompter)
 
     # Load dataset
-    train_dataset = load_dataset("json", data_files=data_args.train_data_file, split="train")
-    eval_dataset = load_dataset("json", data_files=data_args.eval_data_file, split="train")
-    train_dataset = train_dataset.shuffle().map(formatting_prompts_func)
-    eval_dataset = eval_dataset.shuffle().map(formatting_prompts_func)
+    if data_args.train_data_file:
+        train_dataset = load_dataset("json", data_files=data_args.train_data_file, split="train")
+        train_dataset = train_dataset.shuffle().map(formatting_prompts_func)
+    if data_args.eval_data_file:
+        eval_dataset = load_dataset("json", data_files=data_args.eval_data_file, split="train")
+        eval_dataset = eval_dataset.shuffle().map(formatting_prompts_func)
 
     # Set supervised fine-tuning parameters
     trainer = SFTTrainer(
@@ -109,7 +97,7 @@ def main():
     )
 
     # Train model
-    trainer.train()
+    trainer.train(resume_from_checkpoint=training_args.resume_from_checkpoint)
 
     # Save trained model
     trainer.model.save_pretrained(training_args.output_dir)

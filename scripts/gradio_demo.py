@@ -23,7 +23,7 @@ from utils.callbacks import Stream, Iteratorize
 
 
 def print_hello():
-    print("hello")
+    print("hello_123")
 
 
 def evaluate(

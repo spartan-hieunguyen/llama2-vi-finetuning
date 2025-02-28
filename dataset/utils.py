@@ -1,8 +1,3 @@
-a = 1
-c = 2
-d = a + c / 2 / 0
-
-
 def tokenize(prompt, tokenizer, add_eos_token=False, max_len=512):
     result = tokenizer(
         prompt,

@@ -3,12 +3,6 @@ import gradio as gr
 from transformers import GenerationConfig, StoppingCriteriaList
 
 
-def print_hello():
-    print("hello")
-    d = 1 2 3
-    return a / 0
-
-
 def demo(evaluate_fn, server_name):
     gr.Interface(
         fn=evaluate_fn,

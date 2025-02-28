@@ -50,3 +50,7 @@ def generate_prompt(example, prompter):
     )
     example["text"] = text
     return example
+
+
+def print_tokenize():
+    print("hello")

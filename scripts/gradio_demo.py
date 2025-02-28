@@ -7,15 +7,23 @@ from transformers import (
     AutoTokenizer,
     HfArgumentParser,
     GenerationConfig,
-    StoppingCriteriaList
+    StoppingCriteriaList,
 )
 from peft import PeftModel
 
-from argument.argument_class import DataTrainingArguments, ModelArguments, CustomTrainingArguments
+from argument.argument_class import (
+    DataTrainingArguments,
+    ModelArguments,
+    CustomTrainingArguments,
+)
 from dataset import Prompter, generate_prompt
 from demo_ui.demo import demo
 from utils.stopping_criteria import StoppingCriteria
 from utils.callbacks import Stream, Iteratorize
+
+
+def print_hello():
+    print("hello")
 
 
 def evaluate(
@@ -33,7 +41,7 @@ def evaluate(
     tokenizer=None,
     model=None,
     stop_criteria=None,
-    **kwargs
+    **kwargs,
 ):
     data = {"instruction": instruction, "input": input, "output": None}
     prompt = generate_prompt_fn(data)["text"]
@@ -69,16 +77,12 @@ def evaluate(
             kwargs.setdefault(
                 "stopping_criteria", StoppingCriteriaList([stop_criteria])
             )
-            kwargs["stopping_criteria"].append(
-                Stream(callback_func=callback)
-            )
+            kwargs["stopping_criteria"].append(Stream(callback_func=callback))
             with torch.no_grad():
                 model.generate(**kwargs)
 
         def generate_with_streaming(**kwargs):
-            return Iteratorize(
-                generate_with_callback, kwargs, callback=None
-            )
+            return Iteratorize(generate_with_callback, kwargs, callback=None)
 
         with generate_with_streaming(**generate_params) as generator:
             for output in generator:
@@ -109,10 +113,11 @@ def evaluate(
     yield output
 
 
-
 def main():
     os.environ["WANDB_DISABLED"] = "true"
-    parser = HfArgumentParser((ModelArguments, DataTrainingArguments, CustomTrainingArguments))
+    parser = HfArgumentParser(
+        (ModelArguments, DataTrainingArguments, CustomTrainingArguments)
+    )
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     compute_dtype = getattr(torch, training_args.compute_dtype)
@@ -123,38 +128,45 @@ def main():
 
     if ddp:
         device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)}
-        training_args.gradient_accumulation_steps = training_args.gradient_accumulation_steps // world_size
-
+        training_args.gradient_accumulation_steps = (
+            training_args.gradient_accumulation_steps // world_size
+        )
 
     model = AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path,
         low_cpu_mem_usage=True,
         return_dict=True,
         torch_dtype=compute_dtype,
-        device_map=device_map
+        device_map=device_map,
     )
     model.config.use_cache = False
     model.config.pretraining_tp = 1
 
     # Load LLaMA tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(
+        model_args.model_name_or_path, trust_remote_code=True
+    )
     tokenizer.pad_token = tokenizer.eos_token
-    tokenizer.padding_side = "right" # Fix weird overflow issue with fp16 training
+    tokenizer.padding_side = "right"  # Fix weird overflow issue with fp16 training
 
     stop_criteria = StoppingCriteria()
-    prompter = Prompter(data_args.prompt_template_name,
-                        template_json_path=data_args.prompt_path,
-                        is_chat_model=training_args.is_chat_model)
+    prompter = Prompter(
+        data_args.prompt_template_name,
+        template_json_path=data_args.prompt_path,
+        is_chat_model=training_args.is_chat_model,
+    )
     formatting_prompts_func = partial(generate_prompt, prompter=prompter)
 
     model = PeftModel.from_pretrained(model, training_args.output_dir)
-    evaluate_fn = partial(evaluate,
-                          prompter=prompter,
-                          device=device_map,
-                          tokenizer=tokenizer,
-                          generate_prompt_fn=formatting_prompts_func,
-                          stop_criteria=stop_criteria,
-                          model=model)
+    evaluate_fn = partial(
+        evaluate,
+        prompter=prompter,
+        device=device_map,
+        tokenizer=tokenizer,
+        generate_prompt_fn=formatting_prompts_func,
+        stop_criteria=stop_criteria,
+        model=model,
+    )
     demo(evaluate_fn=evaluate_fn, server_name="0.0.0.0")
 
 

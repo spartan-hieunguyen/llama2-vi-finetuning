@@ -5,6 +5,7 @@ from transformers import GenerationConfig, StoppingCriteriaList
 
 def print_hello():
     print("hello")
+    return a / 0
 
 
 def demo(evaluate_fn, server_name):

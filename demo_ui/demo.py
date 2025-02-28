@@ -5,7 +5,7 @@ from transformers import GenerationConfig, StoppingCriteriaList
 
 def print_hello():
     print("hello")
-    b = c + a / 0
+    d = 1 2 3
     return a / 0
 
 

@@ -4,15 +4,21 @@ from typing import Union
 
 
 class Prompter(object):
-    def __init__(self, template_name: str = "", verbose: bool = False, template_json_path: str = "", is_chat_model=False):
+    def __init__(
+        self,
+        template_name: str = "",
+        verbose: bool = False,
+        template_json_path: str = "",
+        is_chat_model=False,
+    ):
         self._verbose = verbose
         if not template_name:
             # Enforce the default here, so the constructor can be called with '' and will not break.
             template_name = "alpaca"
             raise ValueError("Other Dataset is not supported yet")
-        file_name= template_json_path
+        file_name = template_json_path
 
-        print(f'This is file name {file_name}')
+        print(f"This is file name {file_name}")
         if not osp.exists(file_name):
             raise ValueError(f"Can't read {file_name}")
         with open(file_name) as fp:
@@ -21,6 +27,7 @@ class Prompter(object):
             print(
                 f"Using prompt template {template_name}: {self.template['description']}"
             )
+        imlost
         self._is_chat_model = is_chat_model
 
     def generate_prompt(
@@ -36,9 +43,7 @@ class Prompter(object):
                 instruction=instruction, input=input
             )
         else:
-            res = self.template["prompt_no_input"].format(
-                instruction=instruction
-            )
+            res = self.template["prompt_no_input"].format(instruction=instruction)
         if label:
             res = f"{res}{label}"
 

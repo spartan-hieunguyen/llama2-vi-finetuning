@@ -27,7 +27,7 @@ class Prompter(object):
             print(
                 f"Using prompt template {template_name}: {self.template['description']}"
             )
-        imlost
+        imlost in the ocen
         self._is_chat_model = is_chat_model
 
     def generate_prompt(

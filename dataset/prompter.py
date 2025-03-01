@@ -3,6 +3,9 @@ import os.path as osp
 from typing import Union
 
 
+def print_hello():
+    print("hello")
+
 class Prompter(object):
     def __init__(
         self,

@@ -21,7 +21,7 @@ from dataset import Prompter, generate_prompt
 
 def print_hello():
     print("hello_12356")
-    print(123)
+    print(1234)
 
 
 def main():

@@ -2,6 +2,9 @@ import json
 import os.path as osp
 from typing import Union
 
+def print_hello():
+    print("hello_12356")
+
 
 class Prompter(object):
     def __init__(

@@ -4,6 +4,7 @@ from typing import Union
 
 def print_hello():
     print("hello_12356")
+    print(123)
 
 
 class Prompter(object):

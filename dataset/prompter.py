@@ -4,7 +4,8 @@ from typing import Union
 
 def print_hello():
     print("hello_12356")
-    print(123)
+    print(12345)
+    a = b / 0
 
 
 class Prompter(object):

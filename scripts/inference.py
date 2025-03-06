@@ -20,8 +20,11 @@ from dataset import Prompter, generate_prompt
 
 
 def print_hello():
+    # Just want to say hi
     print("hello_12356")
     print(1234)
+    print(123)
+    print(12)
 
 
 def main():

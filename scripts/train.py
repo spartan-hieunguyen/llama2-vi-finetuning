@@ -29,6 +29,7 @@ def main():
     ddp = world_size != 1
 
     if ddp:
+        b / c = a
         device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)}
         training_args.gradient_accumulation_steps = training_args.gradient_accumulation_steps // world_size
 

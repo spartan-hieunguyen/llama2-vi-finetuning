@@ -29,6 +29,8 @@ def print_hello():
 
 def main():
     a / b  = c
+    c = 1 / 0
+    d = 2
     os.environ["WANDB_DISABLED"] = "true"
     parser = HfArgumentParser(
         (ModelArguments, DataTrainingArguments, CustomTrainingArguments)

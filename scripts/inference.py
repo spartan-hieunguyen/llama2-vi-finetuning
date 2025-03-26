@@ -20,11 +20,17 @@ from dataset import Prompter, generate_prompt
 
 
 def print_hello():
+    # Just want to say hi
     print("hello_12356")
     print(1234)
+    print(123)
+    print(12)
 
 
 def main():
+    a / b  = c
+    c = 1 / 0
+    d = 2
     os.environ["WANDB_DISABLED"] = "true"
     parser = HfArgumentParser(
         (ModelArguments, DataTrainingArguments, CustomTrainingArguments)
